@@ -84,7 +84,8 @@
 
     input[type="text"],
     select,
-    textarea {
+    textarea,
+    input[type="file"] {
       width: 100%;
       padding: 0.3rem 0.4rem;
       font-size: 0.8rem;
@@ -142,30 +143,31 @@
 
     @media (max-width: 900px) {
       .layout {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto auto;
-      height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        height: auto;
       }
 
       #map {
-        height: 55vh; /* el mapa ocupa aprox. media pantalla en vertical */
+        height: 55vh; /* mapa ocupa ~mitad de la pantalla */
       }
 
       .panel-formulario {
         border-left: none;
         border-top: 1px solid #e5e7eb;
         height: auto;
-        padding-bottom: 1.5rem; /* más espacio para scroll cómodo */
+        padding-bottom: 1.5rem;
       }
 
       button {
-        padding: 0.6rem 0.8rem; /* botones un poco más grandes para dedo */
+        padding: 0.6rem 0.8rem;
         font-size: 0.9rem;
       }
 
       input[type="text"],
       select,
-      textarea {
+      textarea,
+      input[type="file"] {
         font-size: 0.9rem;
       }
     }
@@ -187,9 +189,9 @@
       <h2>Nuevo reporte ciudadano</h2>
       <p class="help">
         1) Al abrir el visor se intentará usar tu ubicación actual automáticamente.<br />
-        2) Si no funciona o prefieres otro lugar, haz clic en el mapa para marcar la ubicación del problema.<br />
-        3) Completa el formulario y presiona <strong>Guardar reporte</strong>.
-        4) EL reporte es completamente anónimo 
+        2) Si no funciona o prefieres otro lugar, toca el mapa para marcar la ubicación del problema.<br />
+        3) Puedes tomar una foto o subirla desde tu galería.<br />
+        4) Completa el formulario y presiona <strong>Guardar reporte</strong>.
       </p>
 
       <form id="form-reporte">
@@ -248,8 +250,13 @@
         <label for="fecha">Fecha y hora (opcional):</label>
         <input type="text" id="fecha" placeholder="Ej: 2025-11-18 15:30" />
 
-        <label for="foto_url">URL de fotografía (opcional):</label>
-        <input type="text" id="foto_url" placeholder="https://..." />
+        <label for="foto">Fotografía (opcional):</label>
+        <input
+          type="file"
+          id="foto"
+          accept="image/*"
+          capture="environment"
+        />
 
         <button type="submit" id="btn-guardar" disabled>Guardar reporte</button>
         <p class="small">
@@ -310,8 +317,8 @@
           <b>Fecha:</b> ${p.fecha || "-"}<br>
           <b>Descripción:</b> ${p.descripcion || "-"}
         `;
-        if (p.foto_url) {
-          html += `<br><img src="${p.foto_url}" alt="Foto del problema" style="max-width:200px; margin-top:4px;">`;
+        if (p.foto_dataurl) {
+          html += `<br><img src="${p.foto_dataurl}" alt="Foto del problema" style="max-width:200px; margin-top:4px;">`;
         }
         layer.bindPopup(html);
       }
@@ -326,6 +333,23 @@
     const latInput = document.getElementById("lat");
     const lngInput = document.getElementById("lng");
     const btnGuardar = document.getElementById("btn-guardar");
+
+    // Foto
+    const fotoInput = document.getElementById("foto");
+    let fotoDataURLActual = null;
+
+    fotoInput.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) {
+        fotoDataURLActual = null;
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        fotoDataURLActual = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
 
     // Función común para actualizar la ubicación seleccionada
     function actualizarUbicacion(lat, lng) {
@@ -380,7 +404,7 @@
     }
 
     // ====================
-    // 4. Asignar color según tipos
+    // 4. Asignar color según tipo
     // ====================
     function getColor(tipo) {
       switch (tipo) {
@@ -421,7 +445,6 @@
       const accesibilidad = document.getElementById("accesibilidad").value;
       const descripcion = document.getElementById("descripcion").value;
       const fecha = document.getElementById("fecha").value;
-      const foto_url = document.getElementById("foto_url").value;
 
       if (!tipo_afectacion || !superficie || !severidad || !iluminacion || !accesibilidad) {
         alert("Por favor completa los campos obligatorios.");
@@ -443,7 +466,7 @@
           accesibilidad,
           descripcion,
           fecha,
-          foto_url: foto_url || null
+          foto_dataurl: fotoDataURLActual || null
         },
         geometry: {
           type: "Point",
@@ -466,6 +489,7 @@
       // Limpiar formulario (pero mantener coords y marcador)
       form.reset();
       btnGuardar.disabled = true;
+      fotoDataURLActual = null;
       // Si prefieres limpiar también las coordenadas, descomenta:
       // latInput.value = "";
       // lngInput.value = "";
