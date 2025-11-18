@@ -169,12 +169,13 @@
     <aside class="panel-formulario">
       <h2>Nuevo reporte ciudadano</h2>
       <p class="help">
-        1) Haz clic en el mapa para marcar la ubicación del problema.<br />
-        2) Completa el formulario y presiona <strong>Guardar reporte</strong>.
+        1) Al abrir el visor se intentará usar tu ubicación actual automáticamente.<br />
+        2) Si no funciona o prefieres otro lugar, haz clic en el mapa para marcar la ubicación del problema.<br />
+        3) Completa el formulario y presiona <strong>Guardar reporte</strong>.
       </p>
 
       <form id="form-reporte">
-        <label>Coordenadas (clic en el mapa):</label>
+        <label>Coordenadas (GPS o clic en el mapa):</label>
         <div class="fila-coords">
           <input type="text" id="lat" placeholder="Latitud" readonly />
           <input type="text" id="lng" placeholder="Longitud" readonly />
@@ -234,8 +235,7 @@
 
         <button type="submit" id="btn-guardar" disabled>Guardar reporte</button>
         <p class="small">
-          El botón se habilita cuando seleccionas una ubicación en el mapa
-          haciendo clic.
+          El botón se habilita cuando el sistema obtiene tu ubicación o cuando seleccionas una en el mapa.
         </p>
       </form>
 
@@ -303,32 +303,63 @@
     let marcadorTemporal = null;
 
     // ====================
-    // 3. Selección de punto en el mapa
+    // 3. Selección de punto en el mapa y por GPS
     // ====================
     const latInput = document.getElementById("lat");
     const lngInput = document.getElementById("lng");
     const btnGuardar = document.getElementById("btn-guardar");
 
-    map.on("click", function (e) {
-      const lat = e.latlng.lat.toFixed(6);
-      const lng = e.latlng.lng.toFixed(6);
+    // Función común para actualizar la ubicación seleccionada
+    function actualizarUbicacion(lat, lng) {
+      const latFixed = lat.toFixed(6);
+      const lngFixed = lng.toFixed(6);
 
       // Mostrar en el formulario
-      latInput.value = lat;
-      lngInput.value = lng;
+      latInput.value = latFixed;
+      lngInput.value = lngFixed;
 
       // Habilitar botón de guardar
       btnGuardar.disabled = false;
 
+      const latLngObj = L.latLng(lat, lng);
+
       // Mostrar marcador temporal
       if (marcadorTemporal) {
-        marcadorTemporal.setLatLng(e.latlng);
+        marcadorTemporal.setLatLng(latLngObj);
       } else {
-        marcadorTemporal = L.marker(e.latlng, {
+        marcadorTemporal = L.marker(latLngObj, {
           draggable: false
         }).addTo(map);
       }
+
+      // Centrar el mapa en la ubicación seleccionada
+      map.setView(latLngObj, map.getZoom());
+    }
+
+    // Clic en el mapa
+    map.on("click", function (e) {
+      actualizarUbicacion(e.latlng.lat, e.latlng.lng);
     });
+
+    // Intentar usar la ubicación actual del dispositivo
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          actualizarUbicacion(lat, lng);
+        },
+        function (err) {
+          console.warn("No se pudo obtener la ubicación del dispositivo:", err);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000
+        }
+      );
+    } else {
+      console.warn("Geolocalización no soportada por este navegador.");
+    }
 
     // ====================
     // 4. Asignar color según tipo
@@ -360,7 +391,7 @@
 
       // Validar que haya coordenadas
       if (!latInput.value || !lngInput.value) {
-        alert("Primero selecciona una ubicación haciendo clic en el mapa.");
+        alert("Primero selecciona una ubicación (GPS o clic en el mapa).");
         return;
       }
 
@@ -398,7 +429,7 @@
         },
         geometry: {
           type: "Point",
-          coordinates: [lng, lat] // OJO: GeoJSON es [long, lat]
+          coordinates: [lng, lat] // GeoJSON es [long, lat]
         }
       };
 
@@ -408,19 +439,16 @@
       // Agregar al mapa
       capaReportes.addData(feature);
 
-      // Centrar un poco
-      map.setView([lat, lng], map.getZoom());
-
       // Mostrar en lista de la derecha
       const item = document.createElement("div");
       item.className = "item-reporte";
       item.textContent = `${feature.properties.id_reporte}. ${tipo_afectacion} (${severidad}) en ${superficie}`;
       listaReportesDiv.appendChild(item);
 
-      // Limpiar formulario (menos coords)
+      // Limpiar formulario (pero mantener coords y marcador)
       form.reset();
       btnGuardar.disabled = true;
-      // Mantener coordenadas visibles, si quieres dejarlas:
+      // Si prefieres limpiar también las coordenadas, descomenta:
       // latInput.value = "";
       // lngInput.value = "";
     });
