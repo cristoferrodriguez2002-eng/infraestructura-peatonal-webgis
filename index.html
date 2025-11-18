@@ -53,14 +53,17 @@
       height: 100%;
     }
 
-    .panel-formulario {
+    .panel-lateral {
       background: #ffffff;
       border-left: 1px solid #e5e7eb;
       padding: 0.75rem 1rem;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
     }
 
-    .panel-formulario h2 {
+    .panel-lateral h2 {
       margin-top: 0;
       font-size: 1rem;
     }
@@ -71,45 +74,8 @@
       margin-bottom: 0.5rem;
     }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    label {
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    input[type="text"],
-    select,
-    textarea,
-    input[type="file"] {
-      width: 100%;
-      padding: 0.3rem 0.4rem;
-      font-size: 0.8rem;
-      border-radius: 0.25rem;
-      border: 1px solid #d1d5db;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-
-    .fila-coords {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .fila-coords input {
-      flex: 1;
-    }
-
     button {
-      margin-top: 0.5rem;
-      padding: 0.4rem 0.6rem;
+      padding: 0.45rem 0.75rem;
       font-size: 0.85rem;
       border-radius: 999px;
       border: 1px solid #111827;
@@ -118,27 +84,54 @@
       cursor: pointer;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    button.secundario {
+      background: white;
+      color: #111827;
     }
 
-    .small {
-      font-size: 0.75rem;
-      color: #6b7280;
-      margin-top: 0.25rem;
+    .filtros {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .filtros label {
+      font-weight: 600;
+    }
+
+    .filtros select {
+      width: 100%;
+      padding: 0.25rem 0.4rem;
+      font-size: 0.8rem;
+      border-radius: 0.25rem;
+      border: 1px solid #d1d5db;
     }
 
     .lista-reportes {
-      margin-top: 0.75rem;
+      margin-top: 0.25rem;
       border-top: 1px solid #e5e7eb;
       padding-top: 0.5rem;
+      font-size: 0.8rem;
     }
 
     .item-reporte {
-      font-size: 0.8rem;
       padding: 0.25rem 0;
       border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .item-reporte span.tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      background: #e5e7eb;
+      border-radius: 999px;
+      padding: 0.05rem 0.4rem;
+      margin-left: 0.25rem;
+    }
+
+    .resumen {
+      font-size: 0.8rem;
+      color: #374151;
     }
 
     @media (max-width: 900px) {
@@ -149,10 +142,10 @@
       }
 
       #map {
-        height: 55vh; /* mapa ocupa ~mitad de la pantalla */
+        height: 55vh;
       }
 
-      .panel-formulario {
+      .panel-lateral {
         border-left: none;
         border-top: 1px solid #e5e7eb;
         height: auto;
@@ -160,14 +153,11 @@
       }
 
       button {
-        padding: 0.6rem 0.8rem;
+        padding: 0.55rem 0.8rem;
         font-size: 0.9rem;
       }
 
-      input[type="text"],
-      select,
-      textarea,
-      input[type="file"] {
+      .filtros select {
         font-size: 0.9rem;
       }
     }
@@ -177,95 +167,70 @@
 <body>
   <header>
     <h1>WebGIS - Afectación de infraestructura peatonal</h1>
-    <p>La comunidad reporta problemas en veredas, cruces y accesibilidad.</p>
+    <p>Visualizador de reportes ciudadanos sobre veredas, cruces y accesibilidad.</p>
   </header>
 
   <div class="layout">
     <!-- Mapa -->
     <div id="map"></div>
 
-    <!-- Formulario -->
-    <aside class="panel-formulario">
-      <h2>Nuevo reporte ciudadano</h2>
+    <!-- Panel lateral -->
+    <aside class="panel-lateral">
+      <h2>Panel de control</h2>
       <p class="help">
-        1) Al abrir el visor se intentará usar tu ubicación actual automáticamente.<br />
-        2) Si no funciona o prefieres otro lugar, toca el mapa para marcar la ubicación del problema.<br />
-        3) Puedes tomar una foto o subirla desde tu galería.<br />
-        4) Completa el formulario y presiona <strong>Guardar reporte</strong>.
+        Los puntos mostrados corresponden a reportes ciudadanos ya validados y cargados
+        en la base de datos. Esta interfaz es de solo lectura para la comunidad.
       </p>
 
-      <form id="form-reporte">
-        <label>Coordenadas (GPS o clic en el mapa):</label>
-        <div class="fila-coords">
-          <input type="text" id="lat" placeholder="Latitud" readonly />
-          <input type="text" id="lng" placeholder="Longitud" readonly />
+      <!-- Botón al formulario externo (Kobo / Google Forms) -->
+      <button
+        type="button"
+        onclick="window.open('URL_DE_TU_FORMULARIO', '_blank')"
+      >
+        Abrir formulario ciudadano
+      </button>
+      <p class="help">
+        Usa este botón para responder el cuestionario y enviar nuevos reportes.
+        Solo el administrador puede decidir cuáles se integran al mapa.
+      </p>
+
+      <!-- Filtros -->
+      <div class="filtros">
+        <div>
+          <label for="filtroTipo">Tipo de afectación:</label>
+          <select id="filtroTipo">
+            <option value="todos">Todos</option>
+            <option value="Vereda dañada">Vereda dañada</option>
+            <option value="Cruce peligroso">Cruce peligroso</option>
+            <option value="Inundación en vereda">Inundación en vereda</option>
+            <option value="Iluminación deficiente">Iluminación deficiente</option>
+            <option value="Otro">Otro</option>
+          </select>
         </div>
 
-        <label for="tipo_afectacion">Tipo de afectación:</label>
-        <select id="tipo_afectacion" required>
-          <option value="">Selecciona una opción</option>
-          <option value="Vereda dañada">Vereda dañada</option>
-          <option value="Cruce peligroso">Cruce peligroso</option>
-          <option value="Inundación en vereda">Inundación en vereda</option>
-          <option value="Iluminación deficiente">Iluminación deficiente</option>
-          <option value="Otro">Otro</option>
-        </select>
+        <div>
+          <label for="filtroSeveridad">Severidad:</label>
+          <select id="filtroSeveridad">
+            <option value="todas">Todas</option>
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+          </select>
+        </div>
 
-        <label for="superficie">Tipo de superficie:</label>
-        <select id="superficie" required>
-          <option value="">Selecciona una opción</option>
-          <option value="Vereda">Vereda</option>
-          <option value="Cruce">Cruce</option>
-          <option value="Pasarela">Pasarela</option>
-          <option value="Plaza / área verde">Plaza / área verde</option>
-          <option value="Otro">Otro</option>
-        </select>
+        <button class="secundario" type="button" onclick="resetFiltros()">
+          Reiniciar filtros
+        </button>
+      </div>
 
-        <label for="severidad">Severidad del problema:</label>
-        <select id="severidad" required>
-          <option value="">Selecciona una opción</option>
-          <option value="Baja">Baja</option>
-          <option value="Media">Media</option>
-          <option value="Alta">Alta</option>
-        </select>
+      <!-- Resumen -->
+      <div class="resumen" id="resumenTexto">
+        Cargando reportes...
+      </div>
 
-        <label for="iluminacion">Iluminación del sector:</label>
-        <select id="iluminacion" required>
-          <option value="">Selecciona una opción</option>
-          <option value="Buena">Buena</option>
-          <option value="Regular">Regular</option>
-          <option value="Mala">Mala</option>
-        </select>
-
-        <label for="accesibilidad">¿Es accesible para silla de ruedas / coche?</label>
-        <select id="accesibilidad" required>
-          <option value="">Selecciona una opción</option>
-          <option value="Sí">Sí</option>
-          <option value="No">No</option>
-        </select>
-
-        <label for="descripcion">Descripción del problema:</label>
-        <textarea id="descripcion" placeholder="Ej: Vereda rota cerca de colegio, personas mayores tropiezan..."></textarea>
-
-        <label for="fecha">Fecha y hora (opcional):</label>
-        <input type="text" id="fecha" placeholder="Ej: 2025-11-18 15:30" />
-
-        <label for="foto">Fotografía (opcional):</label>
-        <input
-          type="file"
-          id="foto"
-          accept="image/*"
-          capture="environment"
-        />
-
-        <button type="submit" id="btn-guardar" disabled>Guardar reporte</button>
-        <p class="small">
-          El botón se habilita cuando el sistema obtiene tu ubicación o cuando seleccionas una en el mapa.
-        </p>
-      </form>
-
+      <!-- Lista de reportes -->
       <div class="lista-reportes">
-        <strong>Reportes registrados en esta sesión:</strong>
+        <strong>Reportes visibles:</strong>
         <div id="lista-reportes-items"></div>
       </div>
     </aside>
@@ -290,121 +255,18 @@
     }).addTo(map);
 
     // ====================
-    // 2. Estructura de datos en memoria
+    // 2. Variables globales
     // ====================
-    let reportes = {
-      type: "FeatureCollection",
-      features: []
-    };
+    let datosOriginales = null;
+    let capaReportes = null;
 
-    let capaReportes = L.geoJSON(null, {
-      pointToLayer: (feature, latlng) =>
-        L.circleMarker(latlng, {
-          radius: 7,
-          fillColor: getColor(feature.properties.tipo_afectacion),
-          color: "#333",
-          weight: 1,
-          fillOpacity: 0.9
-        }),
-      onEachFeature: (feature, layer) => {
-        const p = feature.properties;
-        let html = `
-          <b>Tipo de afectación:</b> ${p.tipo_afectacion}<br>
-          <b>Superficie:</b> ${p.superficie}<br>
-          <b>Severidad:</b> ${p.severidad}<br>
-          <b>Iluminación:</b> ${p.iluminacion}<br>
-          <b>Accesibilidad:</b> ${p.accesibilidad}<br>
-          <b>Fecha:</b> ${p.fecha || "-"}<br>
-          <b>Descripción:</b> ${p.descripcion || "-"}
-        `;
-        if (p.foto_dataurl) {
-          html += `<br><img src="${p.foto_dataurl}" alt="Foto del problema" style="max-width:200px; margin-top:4px;">`;
-        }
-        layer.bindPopup(html);
-      }
-    }).addTo(map);
-
-    // Para mostrar la ubicación seleccionada antes de guardar
-    let marcadorTemporal = null;
+    const filtroTipo = document.getElementById("filtroTipo");
+    const filtroSeveridad = document.getElementById("filtroSeveridad");
+    const listaReportesDiv = document.getElementById("lista-reportes-items");
+    const resumenTexto = document.getElementById("resumenTexto");
 
     // ====================
-    // 3. Selección de punto en el mapa y por GPS
-    // ====================
-    const latInput = document.getElementById("lat");
-    const lngInput = document.getElementById("lng");
-    const btnGuardar = document.getElementById("btn-guardar");
-
-    // Foto
-    const fotoInput = document.getElementById("foto");
-    let fotoDataURLActual = null;
-
-    fotoInput.addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (!file) {
-        fotoDataURLActual = null;
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function (ev) {
-        fotoDataURLActual = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Función común para actualizar la ubicación seleccionada
-    function actualizarUbicacion(lat, lng) {
-      const latFixed = lat.toFixed(6);
-      const lngFixed = lng.toFixed(6);
-
-      // Mostrar en el formulario
-      latInput.value = latFixed;
-      lngInput.value = lngFixed;
-
-      // Habilitar botón de guardar
-      btnGuardar.disabled = false;
-
-      const latLngObj = L.latLng(lat, lng);
-
-      // Mostrar marcador temporal
-      if (marcadorTemporal) {
-        marcadorTemporal.setLatLng(latLngObj);
-      } else {
-        marcadorTemporal = L.marker(latLngObj, {
-          draggable: false
-        }).addTo(map);
-      }
-
-      // Centrar el mapa en la ubicación seleccionada
-      map.setView(latLngObj, map.getZoom());
-    }
-
-    // Clic en el mapa
-    map.on("click", function (e) {
-      actualizarUbicacion(e.latlng.lat, e.latlng.lng);
-    });
-
-    // Intentar usar la ubicación actual del dispositivo
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        function (pos) {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          actualizarUbicacion(lat, lng);
-        },
-        function (err) {
-          console.warn("No se pudo obtener la ubicación del dispositivo:", err);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000
-        }
-      );
-    } else {
-      console.warn("Geolocalización no soportada por este navegador.");
-    }
-
-    // ====================
-    // 4. Asignar color según tipo
+    // 3. Funciones de estilo y popup
     // ====================
     function getColor(tipo) {
       switch (tipo) {
@@ -421,79 +283,117 @@
       }
     }
 
-    // ====================
-    // 5. Manejo del formulario
-    // ====================
-    const form = document.getElementById("form-reporte");
-    const listaReportesDiv = document.getElementById("lista-reportes-items");
-    let contadorId = 1;
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      // Validar que haya coordenadas
-      if (!latInput.value || !lngInput.value) {
-        alert("Primero selecciona una ubicación (GPS o clic en el mapa).");
-        return;
+    function crearCapa(geojson) {
+      if (capaReportes) {
+        capaReportes.remove();
       }
 
-      // Obtener valores del formulario
-      const tipo_afectacion = document.getElementById("tipo_afectacion").value;
-      const superficie = document.getElementById("superficie").value;
-      const severidad = document.getElementById("severidad").value;
-      const iluminacion = document.getElementById("iluminacion").value;
-      const accesibilidad = document.getElementById("accesibilidad").value;
-      const descripcion = document.getElementById("descripcion").value;
-      const fecha = document.getElementById("fecha").value;
-
-      if (!tipo_afectacion || !superficie || !severidad || !iluminacion || !accesibilidad) {
-        alert("Por favor completa los campos obligatorios.");
-        return;
-      }
-
-      const lat = parseFloat(latInput.value);
-      const lng = parseFloat(lngInput.value);
-
-      // Crear Feature GeoJSON
-      const feature = {
-        type: "Feature",
-        properties: {
-          id_reporte: contadorId++,
-          tipo_afectacion,
-          superficie,
-          severidad,
-          iluminacion,
-          accesibilidad,
-          descripcion,
-          fecha,
-          foto_dataurl: fotoDataURLActual || null
-        },
-        geometry: {
-          type: "Point",
-          coordinates: [lng, lat] // GeoJSON es [long, lat]
+      capaReportes = L.geoJSON(geojson, {
+        pointToLayer: (feature, latlng) =>
+          L.circleMarker(latlng, {
+            radius: 7,
+            fillColor: getColor(feature.properties.tipo_afectacion),
+            color: "#333",
+            weight: 1,
+            fillOpacity: 0.9
+          }),
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties || {};
+          let html = `
+            <b>Tipo de afectación:</b> ${p.tipo_afectacion || "-"}<br>
+            <b>Superficie:</b> ${p.superficie || "-"}<br>
+            <b>Severidad:</b> ${p.severidad || "-"}<br>
+            <b>Iluminación:</b> ${p.iluminacion || "-"}<br>
+            <b>Accesibilidad:</b> ${p.accesibilidad || "-"}<br>
+            <b>Fecha:</b> ${p.fecha || "-"}<br>
+            <b>Descripción:</b> ${p.descripcion || "-"}
+          `;
+          if (p.foto_url) {
+            html += `<br><img src="${p.foto_url}" alt="Foto del problema" style="max-width:200px; margin-top:4px;">`;
+          }
+          layer.bindPopup(html);
         }
+      }).addTo(map);
+
+      if (geojson.features && geojson.features.length > 0) {
+        map.fitBounds(capaReportes.getBounds(), { padding: [20, 20] });
+      }
+    }
+
+    // ====================
+    // 4. Cargar datos desde reportes.geojson
+    // ====================
+    fetch("data/reportes.geojson")
+      .then((resp) => resp.json())
+      .then((geojson) => {
+        datosOriginales = geojson;
+        aplicarFiltros(); // crea capa y lista
+      })
+      .catch((err) => {
+        console.error("Error cargando data/reportes.geojson:", err);
+        resumenTexto.textContent = "No se pudieron cargar los reportes.";
+      });
+
+    // ====================
+    // 5. Filtros y resumen
+    // ====================
+    function aplicarFiltros() {
+      if (!datosOriginales) return;
+
+      const tipoSel = filtroTipo.value;
+      const sevSel = filtroSeveridad.value;
+
+      const filtradas = {
+        ...datosOriginales,
+        features: datosOriginales.features.filter((f) => {
+          const p = f.properties || {};
+          const okTipo = tipoSel === "todos" || p.tipo_afectacion === tipoSel;
+          const okSev = sevSel === "todas" || p.severidad === sevSel;
+          return okTipo && okSev;
+        })
       };
 
-      // Agregar al FeatureCollection
-      reportes.features.push(feature);
+      crearCapa(filtradas);
+      actualizarResumenYLista(filtradas);
+    }
 
-      // Agregar al mapa
-      capaReportes.addData(feature);
+    function resetFiltros() {
+      filtroTipo.value = "todos";
+      filtroSeveridad.value = "todas";
+      aplicarFiltros();
+    }
 
-      // Mostrar en lista de la derecha
-      const item = document.createElement("div");
-      item.className = "item-reporte";
-      item.textContent = `${feature.properties.id_reporte}. ${tipo_afectacion} (${severidad}) en ${superficie}`;
-      listaReportesDiv.appendChild(item);
+    filtroTipo.addEventListener("change", aplicarFiltros);
+    filtroSeveridad.addEventListener("change", aplicarFiltros);
 
-      // Limpiar formulario (pero mantener coords y marcador)
-      form.reset();
-      btnGuardar.disabled = true;
-      fotoDataURLActual = null;
-      // Si prefieres limpiar también las coordenadas, descomenta:
-      // latInput.value = "";
-      // lngInput.value = "";
-    });
+    function actualizarResumenYLista(geojson) {
+      const total = datosOriginales.features.length;
+      const visibles = geojson.features.length;
+
+      resumenTexto.textContent =
+        "Total de reportes cargados: " +
+        total +
+        ". Filtrados visibles: " +
+        visibles +
+        ".";
+
+      listaReportesDiv.innerHTML = "";
+      geojson.features.forEach((f) => {
+        const p = f.properties || {};
+        const div = document.createElement("div");
+        div.className = "item-reporte";
+        const id = p.id_reporte || "-";
+        const tipo = p.tipo_afectacion || "Sin tipo";
+        const sev = p.severidad || "-";
+        const sup = p.superficie || "-";
+        div.innerHTML = `
+          <strong>${id}.</strong> ${tipo} en ${sup}
+          <span class="tag">${sev}</span><br>
+          <span>${p.descripcion || ""}</span>
+        `;
+        listaReportesDiv.appendChild(div);
+      });
+    }
   </script>
 </body>
 </html>
