@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebGIS - Infraestructura peatonal</title>
 
   <!-- Leaflet CSS -->
@@ -141,15 +142,31 @@
 
     @media (max-width: 900px) {
       .layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1.3fr auto;
-        height: auto;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      height: auto;
+      }
+
+      #map {
+        height: 55vh; /* el mapa ocupa aprox. media pantalla en vertical */
       }
 
       .panel-formulario {
         border-left: none;
         border-top: 1px solid #e5e7eb;
         height: auto;
+        padding-bottom: 1.5rem; /* más espacio para scroll cómodo */
+      }
+
+      button {
+        padding: 0.6rem 0.8rem; /* botones un poco más grandes para dedo */
+        font-size: 0.9rem;
+      }
+
+      input[type="text"],
+      select,
+      textarea {
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -172,6 +189,7 @@
         1) Al abrir el visor se intentará usar tu ubicación actual automáticamente.<br />
         2) Si no funciona o prefieres otro lugar, haz clic en el mapa para marcar la ubicación del problema.<br />
         3) Completa el formulario y presiona <strong>Guardar reporte</strong>.
+        4) EL reporte es completamente anónimo 
       </p>
 
       <form id="form-reporte">
