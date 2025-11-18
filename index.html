@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebGIS - Infraestructura peatonal</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: #f5f5f5;
+    }
+
+    header {
+      padding: 0.75rem 1rem;
+      background: #1f2937;
+      color: white;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      height: calc(100vh - 56px);
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .panel-formulario {
+      background: #ffffff;
+      border-left: 1px solid #e5e7eb;
+      padding: 0.75rem 1rem;
+      overflow-y: auto;
+    }
+
+    .panel-formulario h2 {
+      margin-top: 0;
+      font-size: 1rem;
+    }
+
+    .help {
+      font-size: 0.8rem;
+      color: #4b5563;
+      margin-bottom: 0.5rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.3rem 0.4rem;
+      font-size: 0.8rem;
+      border-radius: 0.25rem;
+      border: 1px solid #d1d5db;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .fila-coords {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .fila-coords input {
+      flex: 1;
+    }
+
+    button {
+      margin-top: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.85rem;
+      border-radius: 999px;
+      border: 1px solid #111827;
+      background: #111827;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .small {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+
+    .lista-reportes {
+      margin-top: 0.75rem;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 0.5rem;
+    }
+
+    .item-reporte {
+      font-size: 0.8rem;
+      padding: 0.25rem 0;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1.3fr auto;
+        height: auto;
+      }
+
+      .panel-formulario {
+        border-left: none;
+        border-top: 1px solid #e5e7eb;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>WebGIS - Afectación de infraestructura peatonal</h1>
+    <p>La comunidad reporta problemas en veredas, cruces y accesibilidad.</p>
+  </header>
+
+  <div class="layout">
+    <!-- Mapa -->
+    <div id="map"></div>
+
+    <!-- Formulario -->
+    <aside class="panel-formulario">
+      <h2>Nuevo reporte ciudadano</h2>
+      <p class="help">
+        1) Haz clic en el mapa para marcar la ubicación del problema.<br />
+        2) Completa el formulario y presiona <strong>Guardar reporte</strong>.
+      </p>
+
+      <form id="form-reporte">
+        <label>Coordenadas (clic en el mapa):</label>
+        <div class="fila-coords">
+          <input type="text" id="lat" placeholder="Latitud" readonly />
+          <input type="text" id="lng" placeholder="Longitud" readonly />
+        </div>
+
+        <label for="tipo_afectacion">Tipo de afectación:</label>
+        <select id="tipo_afectacion" required>
+          <option value="">Selecciona una opción</option>
+          <option value="Vereda dañada">Vereda dañada</option>
+          <option value="Cruce peligroso">Cruce peligroso</option>
+          <option value="Inundación en vereda">Inundación en vereda</option>
+          <option value="Iluminación deficiente">Iluminación deficiente</option>
+          <option value="Otro">Otro</option>
+        </select>
+
+        <label for="superficie">Tipo de superficie:</label>
+        <select id="superficie" required>
+          <option value="">Selecciona una opción</option>
+          <option value="Vereda">Vereda</option>
+          <option value="Cruce">Cruce</option>
+          <option value="Pasarela">Pasarela</option>
+          <option value="Plaza / área verde">Plaza / área verde</option>
+          <option value="Otro">Otro</option>
+        </select>
+
+        <label for="severidad">Severidad del problema:</label>
+        <select id="severidad" required>
+          <option value="">Selecciona una opción</option>
+          <option value="Baja">Baja</option>
+          <option value="Media">Media</option>
+          <option value="Alta">Alta</option>
+        </select>
+
+        <label for="iluminacion">Iluminación del sector:</label>
+        <select id="iluminacion" required>
+          <option value="">Selecciona una opción</option>
+          <option value="Buena">Buena</option>
+          <option value="Regular">Regular</option>
+          <option value="Mala">Mala</option>
+        </select>
+
+        <label for="accesibilidad">¿Es accesible para silla de ruedas / coche?</label>
+        <select id="accesibilidad" required>
+          <option value="">Selecciona una opción</option>
+          <option value="Sí">Sí</option>
+          <option value="No">No</option>
+        </select>
+
+        <label for="descripcion">Descripción del problema:</label>
+        <textarea id="descripcion" placeholder="Ej: Vereda rota cerca de colegio, personas mayores tropiezan..."></textarea>
+
+        <label for="fecha">Fecha y hora (opcional):</label>
+        <input type="text" id="fecha" placeholder="Ej: 2025-11-18 15:30" />
+
+        <label for="foto_url">URL de fotografía (opcional):</label>
+        <input type="text" id="foto_url" placeholder="https://..." />
+
+        <button type="submit" id="btn-guardar" disabled>Guardar reporte</button>
+        <p class="small">
+          El botón se habilita cuando seleccionas una ubicación en el mapa
+          haciendo clic.
+        </p>
+      </form>
+
+      <div class="lista-reportes">
+        <strong>Reportes registrados en esta sesión:</strong>
+        <div id="lista-reportes-items"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // ====================
+    // 1. Mapa base
+    // ====================
+    const map = L.map("map").setView([-37.47, -72.35], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    // ====================
+    // 2. Estructura de datos en memoria
+    // ====================
+    let reportes = {
+      type: "FeatureCollection",
+      features: []
+    };
+
+    let capaReportes = L.geoJSON(null, {
+      pointToLayer: (feature, latlng) =>
+        L.circleMarker(latlng, {
+          radius: 7,
+          fillColor: getColor(feature.properties.tipo_afectacion),
+          color: "#333",
+          weight: 1,
+          fillOpacity: 0.9
+        }),
+      onEachFeature: (feature, layer) => {
+        const p = feature.properties;
+        let html = `
+          <b>Tipo de afectación:</b> ${p.tipo_afectacion}<br>
+          <b>Superficie:</b> ${p.superficie}<br>
+          <b>Severidad:</b> ${p.severidad}<br>
+          <b>Iluminación:</b> ${p.iluminacion}<br>
+          <b>Accesibilidad:</b> ${p.accesibilidad}<br>
+          <b>Fecha:</b> ${p.fecha || "-"}<br>
+          <b>Descripción:</b> ${p.descripcion || "-"}
+        `;
+        if (p.foto_url) {
+          html += `<br><img src="${p.foto_url}" alt="Foto del problema" style="max-width:200px; margin-top:4px;">`;
+        }
+        layer.bindPopup(html);
+      }
+    }).addTo(map);
+
+    // Para mostrar la ubicación seleccionada antes de guardar
+    let marcadorTemporal = null;
+
+    // ====================
+    // 3. Selección de punto en el mapa
+    // ====================
+    const latInput = document.getElementById("lat");
+    const lngInput = document.getElementById("lng");
+    const btnGuardar = document.getElementById("btn-guardar");
+
+    map.on("click", function (e) {
+      const lat = e.latlng.lat.toFixed(6);
+      const lng = e.latlng.lng.toFixed(6);
+
+      // Mostrar en el formulario
+      latInput.value = lat;
+      lngInput.value = lng;
+
+      // Habilitar botón de guardar
+      btnGuardar.disabled = false;
+
+      // Mostrar marcador temporal
+      if (marcadorTemporal) {
+        marcadorTemporal.setLatLng(e.latlng);
+      } else {
+        marcadorTemporal = L.marker(e.latlng, {
+          draggable: false
+        }).addTo(map);
+      }
+    });
+
+    // ====================
+    // 4. Asignar color según tipo
+    // ====================
+    function getColor(tipo) {
+      switch (tipo) {
+        case "Vereda dañada":
+          return "#e41a1c";
+        case "Cruce peligroso":
+          return "#377eb8";
+        case "Inundación en vereda":
+          return "#4daf4a";
+        case "Iluminación deficiente":
+          return "#984ea3";
+        default:
+          return "#ff7f00";
+      }
+    }
+
+    // ====================
+    // 5. Manejo del formulario
+    // ====================
+    const form = document.getElementById("form-reporte");
+    const listaReportesDiv = document.getElementById("lista-reportes-items");
+    let contadorId = 1;
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Validar que haya coordenadas
+      if (!latInput.value || !lngInput.value) {
+        alert("Primero selecciona una ubicación haciendo clic en el mapa.");
+        return;
+      }
+
+      // Obtener valores del formulario
+      const tipo_afectacion = document.getElementById("tipo_afectacion").value;
+      const superficie = document.getElementById("superficie").value;
+      const severidad = document.getElementById("severidad").value;
+      const iluminacion = document.getElementById("iluminacion").value;
+      const accesibilidad = document.getElementById("accesibilidad").value;
+      const descripcion = document.getElementById("descripcion").value;
+      const fecha = document.getElementById("fecha").value;
+      const foto_url = document.getElementById("foto_url").value;
+
+      if (!tipo_afectacion || !superficie || !severidad || !iluminacion || !accesibilidad) {
+        alert("Por favor completa los campos obligatorios.");
+        return;
+      }
+
+      const lat = parseFloat(latInput.value);
+      const lng = parseFloat(lngInput.value);
+
+      // Crear Feature GeoJSON
+      const feature = {
+        type: "Feature",
+        properties: {
+          id_reporte: contadorId++,
+          tipo_afectacion,
+          superficie,
+          severidad,
+          iluminacion,
+          accesibilidad,
+          descripcion,
+          fecha,
+          foto_url: foto_url || null
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [lng, lat] // OJO: GeoJSON es [long, lat]
+        }
+      };
+
+      // Agregar al FeatureCollection
+      reportes.features.push(feature);
+
+      // Agregar al mapa
+      capaReportes.addData(feature);
+
+      // Centrar un poco
+      map.setView([lat, lng], map.getZoom());
+
+      // Mostrar en lista de la derecha
+      const item = document.createElement("div");
+      item.className = "item-reporte";
+      item.textContent = `${feature.properties.id_reporte}. ${tipo_afectacion} (${severidad}) en ${superficie}`;
+      listaReportesDiv.appendChild(item);
+
+      // Limpiar formulario (menos coords)
+      form.reset();
+      btnGuardar.disabled = true;
+      // Mantener coordenadas visibles, si quieres dejarlas:
+      // latInput.value = "";
+      // lngInput.value = "";
+    });
+  </script>
+</body>
+</html>
