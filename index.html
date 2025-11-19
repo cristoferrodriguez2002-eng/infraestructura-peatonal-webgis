@@ -430,13 +430,13 @@
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-
+    
       // Validar que haya coordenadas
       if (!latInput.value || !lngInput.value) {
         alert("Primero selecciona una ubicación (GPS o clic en el mapa).");
         return;
       }
-
+    
       // Obtener valores del formulario
       const tipo_afectacion = document.getElementById("tipo_afectacion").value;
       const superficie = document.getElementById("superficie").value;
@@ -445,15 +445,15 @@
       const accesibilidad = document.getElementById("accesibilidad").value;
       const descripcion = document.getElementById("descripcion").value;
       const fecha = document.getElementById("fecha").value;
-
+    
       if (!tipo_afectacion || !superficie || !severidad || !iluminacion || !accesibilidad) {
         alert("Por favor completa los campos obligatorios.");
         return;
       }
-
+    
       const lat = parseFloat(latInput.value);
       const lng = parseFloat(lngInput.value);
-
+    
       // Crear Feature GeoJSON
       const feature = {
         type: "Feature",
@@ -473,27 +473,25 @@
           coordinates: [lng, lat] // GeoJSON es [long, lat]
         }
       };
-
+    
       // Agregar al FeatureCollection
       reportes.features.push(feature);
-
+    
       // Agregar al mapa
       capaReportes.addData(feature);
-
+    
       // Mostrar en lista de la derecha
       const item = document.createElement("div");
       item.className = "item-reporte";
       item.textContent = `${feature.properties.id_reporte}. ${tipo_afectacion} (${severidad}) en ${superficie}`;
       listaReportesDiv.appendChild(item);
-
+    
       // Limpiar formulario (pero mantener coords y marcador)
       form.reset();
       btnGuardar.disabled = true;
       fotoDataURLActual = null;
-      // Si prefieres limpiar también las coordenadas, descomenta:
-      // latInput.value = "";
-      // lngInput.value = "";
     });
+
   </script>
 </body>
 </html>
