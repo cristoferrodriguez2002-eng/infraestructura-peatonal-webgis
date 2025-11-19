@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_ecad1e20e0238fadaf0f92c5d39158cb {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_ecad1e20e0238fadaf0f92c5d39158cb" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_ecad1e20e0238fadaf0f92c5d39158cb = L.map(
+                "map_ecad1e20e0238fadaf0f92c5d39158cb",
+                {
+                    center: [-37.472177, -72.345624],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 13,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_501ab6bf1bdd8856a9683b708e882503 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_501ab6bf1bdd8856a9683b708e882503.addTo(map_ecad1e20e0238fadaf0f92c5d39158cb);
+        
+    
+            var marker_5eb2af6badf2596f8e8eb0cc34ec1113 = L.marker(
+                [-37.472177, -72.345624],
+                {
+}
+            ).addTo(map_ecad1e20e0238fadaf0f92c5d39158cb);
+        
+    
+        var popup_d553ed47c80b5f0f83c32b549170a937 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_117332b845d1198a78377784746e5533 = $(`<div id="html_117332b845d1198a78377784746e5533" style="width: 100.0%; height: 100.0%;">Tipo de afectación: vereda_da_ada</div>`)[0];
+                popup_d553ed47c80b5f0f83c32b549170a937.setContent(html_117332b845d1198a78377784746e5533);
+            
+        
+
+        marker_5eb2af6badf2596f8e8eb0cc34ec1113.bindPopup(popup_d553ed47c80b5f0f83c32b549170a937)
+        ;
+
+        
+    
+    
+            var marker_5502fa531d320d49934061629774262f = L.marker(
+                [-36.821685, -73.046049],
+                {
+}
+            ).addTo(map_ecad1e20e0238fadaf0f92c5d39158cb);
+        
+    
+        var popup_dd1d81ecb184e8c2ffb221184f4b93f9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6e8219e95ab4d6435d700a5955186f77 = $(`<div id="html_6e8219e95ab4d6435d700a5955186f77" style="width: 100.0%; height: 100.0%;">Tipo de afectación: vereda_da_ada</div>`)[0];
+                popup_dd1d81ecb184e8c2ffb221184f4b93f9.setContent(html_6e8219e95ab4d6435d700a5955186f77);
+            
+        
+
+        marker_5502fa531d320d49934061629774262f.bindPopup(popup_dd1d81ecb184e8c2ffb221184f4b93f9)
+        ;
+
+        
+    
+    
+            var marker_e525e5975dccef3abc0243e558fb2d67 = L.marker(
+                [-37.472317, -72.34551],
+                {
+}
+            ).addTo(map_ecad1e20e0238fadaf0f92c5d39158cb);
+        
+    
+        var popup_a262b4bc4c459d23a4ff1b38fae28f70 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c4fdc621d2bfea1fd8be6be441e081f9 = $(`<div id="html_c4fdc621d2bfea1fd8be6be441e081f9" style="width: 100.0%; height: 100.0%;">Tipo de afectación: cruce_peligroso</div>`)[0];
+                popup_a262b4bc4c459d23a4ff1b38fae28f70.setContent(html_c4fdc621d2bfea1fd8be6be441e081f9);
+            
+        
+
+        marker_e525e5975dccef3abc0243e558fb2d67.bindPopup(popup_a262b4bc4c459d23a4ff1b38fae28f70)
+        ;
+
+        
+    
+    
+            var marker_9b9b08c797c3c57ff7611daff8b98459 = L.marker(
+                [-37.440676, -72.331892],
+                {
+}
+            ).addTo(map_ecad1e20e0238fadaf0f92c5d39158cb);
+        
+    
+        var popup_afccbda6b14ad68a72d99e04577d84f9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f88878d5e03491ab08dda9fb84dcf803 = $(`<div id="html_f88878d5e03491ab08dda9fb84dcf803" style="width: 100.0%; height: 100.0%;">Tipo de afectación: cruce_peligroso</div>`)[0];
+                popup_afccbda6b14ad68a72d99e04577d84f9.setContent(html_f88878d5e03491ab08dda9fb84dcf803);
+            
+        
+
+        marker_9b9b08c797c3c57ff7611daff8b98459.bindPopup(popup_afccbda6b14ad68a72d99e04577d84f9)
+        ;
+
+        
+    
+</script>
+</html>
